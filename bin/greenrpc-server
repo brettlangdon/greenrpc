@@ -6,7 +6,7 @@ from greenrpc.server import TCPServer, WSGIServer
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Start a new GreenRPC TCP Server")
-    parser.add_argument("module", metavar="<module>", type=str,
+    parser.add_argument("modules", metavar="<module>", type=str, nargs="+",
                         help="Python module to expose for the RPC Server")
     default_bind = "127.0.0.1:%s" % (DEFAULT_PORT, )
     parser.add_argument("--bind", dest="bind", type=str, default=default_bind,
@@ -20,9 +20,9 @@ if __name__ == "__main__":
     address, _, port = args.bind.partition(":")
     bind = (address, int(port))
     if args.http:
-        server = WSGIServer(args.module, bind=bind, spawn=args.spawn)
+        server = WSGIServer(args.modules, bind=bind, spawn=args.spawn)
     else:
-        server = TCPServer(args.module, bind=bind, spawn=args.spawn)
+        server = TCPServer(args.modules, bind=bind, spawn=args.spawn)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

@@ -6,16 +6,31 @@ import msgpack
 
 class BaseServer(object):
     SOCKET_BUFFER_SIZE = 1024
+    ALLOWED_TYPES = (types.FunctionType, types.MethodType, types.BuiltinFunctionType, types.BuiltinMethodType)
 
     def __init__(self, services):
-        if isinstance(services, (dict, types.ModuleType)):
-            self.services = services
-        elif isinstance(services, basestring):
-            self.services = __import__(services)
-        else:
+        self.services = self.load_services(services)
+        if not self.services:
             raise TypeError("First argument to BaseServer.__init__ must be a dict or a string")
 
         self.packer = msgpack.Packer()
+
+    def load_services(self, module):
+        services = {}
+        if isinstance(module, dict):
+            services.update(module)
+        elif isinstance(module, types.ModuleType):
+            for name in dir(module):
+                if not name.startswith("_"):
+                    attr = getattr(module, name)
+                    if isinstance(attr, self.ALLOWED_TYPES):
+                        services[name] = attr
+        elif isinstance(module, basestring):
+            services.update(self.load_services(__import__(module)))
+        elif isinstance(module, (tuple, list)):
+            for m in module:
+                services.update(self.load_services(m))
+        return services
 
     def unpack_requests(self, sock):
         unpacker = msgpack.Unpacker()
@@ -42,11 +57,11 @@ class BaseServer(object):
 
         if not req_method:
             result["error"] = "No request method was provided"
-        elif not hasattr(self.services, req_method):
+        elif not isinstance(self.services.get(req_method), self.ALLOWED_TYPES):
             result["error"] = "Unknown request method '%s'" % (req_method, )
         else:
             try:
-                result["results"] = getattr(self.services, req_method)(*req_args)
+                result["results"] = self.services[req_method](*req_args)
             except Exception, e:
                 result["error"] = e.message
 
