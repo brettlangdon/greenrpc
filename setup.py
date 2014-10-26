@@ -11,7 +11,7 @@ with open("./requirements.txt") as fp:
 setup(
     name="greenrpc",
     version=__version__,
-    description="msgpack TCP & HTTP RPC Servers written with gevent",
+    description="TCP & HTTP RPC Servers written with msgpack and gevent",
     author="Brett Langdon",
     author_email="brett@blangdon.com",
     url="https://github.com/brettlangdon/greenrpc",
