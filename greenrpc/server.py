@@ -6,12 +6,12 @@ from gevent import pywsgi
 from gevent.server import StreamServer
 import msgpack
 
-from greenrpc import TCP_SERVER_DEFAULT_PORT, HTTP_SERVER_DEFAULT_PORT
+from greenrpc import DEFAULT_PORT
 from greenrpc.base import BaseServer
 
 
 class TCPServer(StreamServer, BaseServer):
-    def __init__(self, services, bind=("127.0.0.1", TCP_SERVER_DEFAULT_PORT), spawn=1):
+    def __init__(self, services, bind=("127.0.0.1", DEFAULT_PORT), spawn=1):
         StreamServer.__init__(self, bind, spawn=spawn)
         BaseServer.__init__(self, services)
 
@@ -25,8 +25,8 @@ class TCPServer(StreamServer, BaseServer):
 
 
 class WSGIServer(pywsgi.WSGIServer, BaseServer):
-    def __init__(self, services, bind=("127.0.0.1", HTTP_SERVER_DEFAULT_PORT)):
-        pywsgi.WSGIServer.__init__(self, bind)
+    def __init__(self, services, bind=("127.0.0.1", DEFAULT_PORT), spawn=1):
+        pywsgi.WSGIServer.__init__(self, bind, spawn=spawn)
         BaseServer.__init__(self, services)
 
     def decode(self, decoder, data):
