@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+import argparse
+
+from greenrpc import TCP_SERVER_DEFAULT_PORT
+from greenrpc.server import TCPServer
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Start a new GreenRPC TCP Server")
+    parser.add_argument("module", metavar="<module>", type=str,
+                        help="Python module to expose for the RPC Server")
+    default_bind = "127.0.0.1:%s" % (TCP_SERVER_DEFAULT_PORT, )
+    parser.add_argument("--bind", dest="bind", type=str, default=default_bind,
+                        help="<address>:<port> to bind the server to (default: %s)" % (default_bind, ))
+    parser.add_argument("--spawn", dest="spawn", type=int, default=4,
+                        help="number of greenlets to spawn (default: 4)")
+
+    args = parser.parse_args()
+    address, _, port = args.bind.partition(":")
+    server = TCPServer(args.module, bind=(address, int(port)), spawn=args.spawn)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print "Stopping GreenRPC Server"
+        server.stop()

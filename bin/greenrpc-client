@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import argparse
+
+from greenrpc import TCP_SERVER_DEFAULT_PORT
+from greenrpc.client import TCPClient
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Start a new GreenRPC TCP Server")
+    parser.add_argument("method", metavar="<method>", type=str,
+                        help="The remote method to call")
+    parser.add_argument("args", metavar="<arg>", nargs="*", type=str,
+                        help="Arguments to send for the remote method call")
+
+    default_connect = "127.0.0.1:%s" % (TCP_SERVER_DEFAULT_PORT, )
+    parser.add_argument("--connect", dest="connect", type=str, default=default_connect,
+                        help="<address>:<port> of the server to connect to(default: %s)" % (default_connect, ))
+
+    parser.add_argument("--debug", dest="debug", action="store_true", default=False,
+                        help="Whether or not to show the full result")
+
+    args = parser.parse_args()
+    address, _, port = args.connect.partition(":")
+    client = TCPClient(connect=(address, int(port)))
+    result = client.call(args.method, args.args, debug=args.debug)
+    print result
