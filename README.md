@@ -43,6 +43,11 @@ an RPC server
 $ greenrpc-server time
 ```
 
+Exposing multiple modules
+```
+$ greenrpc-server time json
+```
+
 ### cli client
 ```bash
 $ greenrpc-client -h
