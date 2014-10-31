@@ -90,7 +90,10 @@ class BaseClient(object):
             if not data:
                 break
             self.unpacker.feed(data)
-            return self.unpacker.next()
+            try:
+                return self.unpacker.next()
+            except StopIteration:
+                continue
 
     def __getattr__(self, method):
         def wrapper(*args):
