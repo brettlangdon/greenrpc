@@ -1,4 +1,4 @@
-include README.* LICENSE setup.py setup.cfg
+include README.* LICENSE setup.py setup.cfg requirements.txt
 recursive-include greenrpc *.py
 global-exclude *.pyc
 global-exclude *.pyo
