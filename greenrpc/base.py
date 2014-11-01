@@ -63,7 +63,7 @@ class BaseServer(object):
             try:
                 result["results"] = self.services[req_method](*req_args)
             except Exception, e:
-                result["error"] = e.message
+                result["error"] = repr(e)
 
         result["run_time"] = (time.time() - start_time) * 1000.0
         return result
